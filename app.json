@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "experiments": {
+      "reactCompiler": true,
+      "typedRoutes": true
+    },
+    "icon": "./assets/app.icon",
+    "ios": {
+      "buildNumber": "0.0.0",
+      "bundleIdentifier": "nl.steijnveer.envelope",
+      "supportsTablet": false
+    },
+    "name": "Envelope",
+    "orientation": "portrait",
+    "platforms": [
+      "ios"
+    ],
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#208AEF"
+        }
+      ],
+      "expo-sqlite"
+    ],
+    "scheme": "envelope",
+    "slug": "envelope",
+    "userInterfaceStyle": "automatic",
+    "version": "0.0.0",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7338dd39-09e1-4ba3-8380-476033a049f2"
+      }
+    }
+  }
+}
