@@ -1,10 +1,11 @@
-import type { StepProps } from '@/components/setup/types';
-import { ThemedText } from '@/components/themed-text';
+import type { SetupStepProps } from '@/components/setup/page';
+import { SetupStepPlaceholder } from '@/components/setup/page';
 
-export function Step3({ onNext }: StepProps) {
+export function Step3({ onNext }: SetupStepProps) {
   return (
-    <>
-      <ThemedText type="title">Step 3</ThemedText>
-    </>
+    <SetupStepPlaceholder
+      onNext={onNext}
+      index={3}
+    />
   );
 }

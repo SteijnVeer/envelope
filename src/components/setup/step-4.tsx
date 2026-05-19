@@ -1,11 +1,11 @@
 import type { SetupStepProps } from '@/components/setup/page';
 import { SetupStepPlaceholder } from '@/components/setup/page';
 
-export function Step2({ onNext }: SetupStepProps) {
+export function Step4({ onNext }: SetupStepProps) {
   return (
     <SetupStepPlaceholder
       onNext={onNext}
-      index={2}
+      index={4}
     />
   );
 }

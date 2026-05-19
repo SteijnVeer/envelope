@@ -4,7 +4,13 @@
       "reactCompiler": true,
       "typedRoutes": true
     },
-    "icon": "./assets/app.icon",
+    "extra": {
+      "eas": {
+        "projectId": "7338dd39-09e1-4ba3-8380-476033a049f2"
+      },
+      "router": {}
+    },
+    "icon": "./assets/images/expo-icon.svg",
     "ios": {
       "buildNumber": "0.0.0",
       "bundleIdentifier": "nl.steijnveer.envelope",
@@ -20,7 +26,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF"
+          "backgroundColor": "#555"
         }
       ],
       "expo-sqlite"
@@ -28,12 +34,6 @@
     "scheme": "envelope",
     "slug": "envelope",
     "userInterfaceStyle": "automatic",
-    "version": "0.0.0",
-    "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "7338dd39-09e1-4ba3-8380-476033a049f2"
-      }
-    }
+    "version": "0.0.0"
   }
 }

@@ -1,22 +1,8 @@
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
 import { ThemeProvider } from '@/contexts/theme';
 import { TranslatorProvider } from '@/contexts/translator';
 import { Stack } from 'expo-router';
 
-// delete afterwards
-export default function TabLayout() {
-  return (
-    <ThemeProvider>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
-  );
-}
-
-function RootLayout() {
-  // add database provider in future here -> load resources in index.tsx and show splash screen until then
-  // for db use expo-sqlite
+export default function RootLayout() {
   return (
     <ThemeProvider>
       <TranslatorProvider>

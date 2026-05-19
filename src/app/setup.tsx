@@ -1,28 +1,41 @@
 import { GlassView } from 'expo-glass-effect';
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import PagerView from 'react-native-pager-view';
 import type { SharedValue } from 'react-native-reanimated';
 import { createAnimatedComponent, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Step1 } from '@/components/setup/step-1';
-import { Step2 } from '@/components/setup/step-2';
-import { Step3 } from '@/components/setup/step-3';
-import type { StepProps } from '@/components/setup/types';
+import type { SetupStepProps } from '@/components/setup/page';
 import { useColor } from '@/contexts/theme';
 
-const AnimatedGlassView = createAnimatedComponent(GlassView);
+import Step1 from '@/components/setup/language';
+import { Step2 } from '@/components/setup/step-2';
+import { Step3 } from '@/components/setup/step-3';
+import { Step4 } from '@/components/setup/step-4';
 
-const STEPS: React.ComponentType<StepProps>[] = [Step1, Step2, Step3];
+// --- Constants ---
+
+const STEPS: React.ComponentType<SetupStepProps>[] = [Step1, Step2, Step3, Step4];
 const MAX_STEP = STEPS.length - 1;
 
 const DOT_SIZE_BASE = 8;
 const DOT_WIDTH_ACTIVE = 24;
 const DOT_WIDTH_INCREASE = DOT_WIDTH_ACTIVE - DOT_SIZE_BASE;
+
+const DOT_SPACING = 6;
+
 const DOT_OPACITY_BASE = 0.3;
 const DOT_OPACITY_ACTIVE = 1;
 const DOT_OPACITY_INCREASE = DOT_OPACITY_ACTIVE - DOT_OPACITY_BASE;
+
+const DOT_ANIMATION_DURATION = 300;
+
+// --- Internal ---
+
+const AnimatedGlassView = createAnimatedComponent(GlassView);
 
 type DotProps = {
   index: number;
@@ -36,19 +49,13 @@ function Dot({ index, animatedPosition, color, visited }: DotProps) {
 
   useEffect(() => {
     if (visited)
-      visibleProgress.value = withTiming(1, { duration: 300 });
+      visibleProgress.value = withTiming(1, { duration: DOT_ANIMATION_DURATION });
   }, [visited]);
-
-  if (!visited)
-    return null;
 
   const animatedStyle = useAnimatedStyle(() => {
     const activation = Math.max(0, 1 - Math.abs(animatedPosition.value - index));
     const width = DOT_SIZE_BASE + DOT_WIDTH_INCREASE * activation;
-    const opacity = Math.min(
-      DOT_OPACITY_BASE + DOT_OPACITY_INCREASE * activation,
-      visibleProgress.value
-    );
+    const opacity = DOT_OPACITY_BASE + DOT_OPACITY_INCREASE * activation;
     const transform = [{ scale: visibleProgress.value }];
     return { width, opacity, transform };
   });
@@ -56,6 +63,7 @@ function Dot({ index, animatedPosition, color, visited }: DotProps) {
   return (
     <AnimatedGlassView
       tintColor={color}
+      glassEffectStyle='clear'
       style={[
         styles.dot,
         animatedStyle,
@@ -64,19 +72,32 @@ function Dot({ index, animatedPosition, color, visited }: DotProps) {
   );
 }
 
+// --- Screen ---
+
 export default function SetupScreen() {
+  const router = useRouter();
   const dotColor = useColor('text');
   const animatedPosition = useSharedValue(0);
   const pagerRef = useRef<PagerView>(null);
   const [maxVisitedPage, setMaxVisitedPage] = useState(0);
+  const insets = useSafeAreaInsets();
+  const insetStyle = {
+    paddingTop: insets.top,
+    paddingBottom: insets.bottom,
+  };
+  const indicatorInsetStyle = {
+    bottom: insets.bottom + styles.indicator.bottom,
+  };
 
   const goNext = useCallback((currentStep: number) => {
-    if (currentStep < MAX_STEP) {
-      const nextStep = currentStep + 1;
-      setMaxVisitedPage((prev) => Math.max(prev, nextStep));
-      pagerRef.current?.setPage(nextStep);
-    }
-  }, []);
+    if (currentStep === MAX_STEP)
+      return router.replace('/home');
+    const nextStep = currentStep + 1;
+    if (nextStep === MAX_STEP)
+      pagerRef.current?.setScrollEnabled(true);
+    setMaxVisitedPage((prev) => Math.max(prev, nextStep));
+    pagerRef.current?.setPage(nextStep);
+  }, [router]);
 
   return (
     <View
@@ -84,13 +105,9 @@ export default function SetupScreen() {
     >
       <PagerView
         ref={pagerRef}
-        style={styles.pager}
+        style={styles.container}
+        scrollEnabled={false}
         initialPage={0}
-        onPageSelected={(e) => {
-          const page = e.nativeEvent.position;
-          if (page > maxVisitedPage)
-            pagerRef.current?.setPage(maxVisitedPage);
-        }}
         onPageScroll={(e) => {
           animatedPosition.value = e.nativeEvent.position + e.nativeEvent.offset;
         }}
@@ -98,7 +115,10 @@ export default function SetupScreen() {
         {STEPS.map((Step, i) => (
           <View
             key={i}
-            style={styles.page}
+            style={[
+              styles.container,
+              insetStyle
+            ]}
           >
             <Step
               onNext={() => goNext(i)}
@@ -108,7 +128,10 @@ export default function SetupScreen() {
       </PagerView>
 
       <View
-        style={styles.indicator}
+        style={[
+          styles.indicator,
+          indicatorInsetStyle,
+        ]}
         pointerEvents='none'
       >
         {STEPS.map((_, i) => (
@@ -133,21 +156,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  pager: {
-    flex: 1,
-  },
-  page: {
-    flex: 1,
-  },
   indicator: {
     position: 'absolute',
-    bottom: 60,
+    bottom: 32,
     left: 0,
     right: 0,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: DOT_SIZE_BASE * 3/4,
+    gap: DOT_SPACING,
   },
   dot: {
     height: DOT_SIZE_BASE,

@@ -15,7 +15,7 @@ export default function TabLayout() {
       }}
     >
       <NativeTabs.Trigger
-        name='index' // replace with actual route name and icons!
+        name='home'
       >
         <NativeTabs.Trigger.Label>
           Home
@@ -30,10 +30,10 @@ export default function TabLayout() {
       </NativeTabs.Trigger>
 
       <NativeTabs.Trigger
-        name='explore' // replace with actual route name and icons!
+        name='write'
       >
         <NativeTabs.Trigger.Label>
-          Explore
+          Write
         </NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           sf={{

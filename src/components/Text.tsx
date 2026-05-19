@@ -10,7 +10,7 @@ export type TextProps = Omit<RNTextProps, 'children'> & {
   type?: TextTypes;
 };
 
-export default function Text({ text, type, ...props}: TextProps) {
+export function Text({ text, type, ...props}: TextProps) {
   const translated = useTranslation(text);
   return <RNText
     {...props}
@@ -30,7 +30,7 @@ const textTypeStyles = StyleSheet.create({
   base: {
     fontSize: 16,
     fontWeight: 'normal',
-    color: 'black',
+    color: 'white',
   },
   title: {
     fontSize: 32,
