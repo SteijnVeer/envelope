@@ -1,6 +1,6 @@
 import { Page } from '@/components/page';
 
-export default function Home() {
+export default function Saved() {
   return (
     <Page
       scrollable

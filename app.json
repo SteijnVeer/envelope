@@ -14,7 +14,10 @@
     "ios": {
       "buildNumber": "0.0.0",
       "bundleIdentifier": "nl.steijnveer.envelope",
-      "supportsTablet": false
+      "supportsTablet": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "name": "Envelope",
     "orientation": "portrait",
@@ -26,7 +29,11 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#555"
+          "backgroundColor": "#fff",
+          "dark": {
+            "backgroundColor": "#000"
+          },
+          "image": "./assets/images/expo-icon.svg"
         }
       ],
       "expo-sqlite"

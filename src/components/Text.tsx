@@ -1,28 +1,63 @@
+import { FontMargin, useLightDark, useThemedStyle } from '@/contexts/theme';
 import type { TranslationKey } from '@/contexts/translator';
 import { useTranslation } from '@/contexts/translator';
 import type { TextProps as RNTextProps } from 'react-native';
 import { Text as RNText, StyleSheet } from 'react-native';
 
-export type TextTypes = 'title' | 'header'  | 'subheader'  | 'paragraph'  | 'label';
+export type TextTypes =
+  | 'caption'
+  | 'code'
+  | 'label'
+  | 'paragraph'
+  | 'body'
+  | 'subheading'
+  | 'heading'
+  | 'subtitle'
+  | 'title'
+  | 'display';
 
-export type TextProps = Omit<RNTextProps, 'children'> & {
-  text: TranslationKey | string;
+export type TextProps = RNTextProps & {
+  text?: TranslationKey | string;
   type?: TextTypes;
+  color?: string | {
+    light?: string;
+    dark?: string;
+  };
+  autoMargin?: 'top' | 'bottom' | 'both' | 'none' | boolean;
+  centered?: boolean;
 };
 
-export function Text({ text, type, ...props}: TextProps) {
+const __NO_TEXT_PROVIDED__ = '__NO_TEXT_PROVIDED__' as const;
+
+export function Text({ text = __NO_TEXT_PROVIDED__, children, type = 'body', color, autoMargin = 'none', centered = false, style, ...props}: TextProps) {
   const translated = useTranslation(text);
+  const themedStyle = useThemedStyle({ color: 'text', fontSize: type });
+  const themedColor = useLightDark<string | undefined>(color);
+  const colorStyle = themedColor ? { color: themedColor } : null;
+  const marginValue = FontMargin[type];
+  const marginStyle = autoMargin && autoMargin !== 'none' ? (
+    autoMargin === true || autoMargin === 'both'
+      ? { marginVertical: marginValue }
+      : autoMargin === 'top'
+        ? { marginTop: marginValue }
+        : { marginBottom: marginValue }
+  ) : null;
+
   return <RNText
     {...props}
     style={[
       textTypeStyles.base,
-      type
-        ? textTypeStyles[type]
-        : undefined,
-      props.style,
+      centered && textTypeStyles.centered,
+      themedStyle,
+      colorStyle,
+      marginStyle,
+      style,
     ]}
   >
-    {translated}
+    {translated !== __NO_TEXT_PROVIDED__
+      ? translated
+      : children
+    }
   </RNText>;
 }
 
@@ -30,25 +65,9 @@ const textTypeStyles = StyleSheet.create({
   base: {
     fontSize: 16,
     fontWeight: 'normal',
-    color: 'white',
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'heavy',
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  subheader: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  paragraph: {
-    fontSize: 16,
-  },
-  label: {
-    fontSize: 14,
-    color: 'gray',
+  centered: {
+    textAlign: 'center',
+    width: '100%',
   },
 });

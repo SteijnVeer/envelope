@@ -1,5 +1,13 @@
+import type { FillableIconName, IconName } from '@/components/icon';
 import { useTheme } from '@/contexts/theme';
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
+
+function fillableTriggerIcon(name: FillableIconName): { default: IconName; selected: IconName } {
+  return {
+    default: name,
+    selected: `${name}.fill`,
+  };
+}
 
 export default function TabLayout() {
   const colors = useTheme();
@@ -9,8 +17,11 @@ export default function TabLayout() {
       backgroundColor={colors.background}
       indicatorColor={colors.backgroundElement}
       labelStyle={{
-        selected: {
+        default: {
           color: colors.text,
+        },
+        selected: {
+          color: colors.primary,
         },
       }}
     >
@@ -21,10 +32,7 @@ export default function TabLayout() {
           Home
         </NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          sf={{
-            default: 'house',
-            selected: 'house.fill',
-          }}
+          sf={fillableTriggerIcon('house')}
           renderingMode='template'
         />
       </NativeTabs.Trigger>
@@ -36,10 +44,43 @@ export default function TabLayout() {
           Write
         </NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
-          sf={{
-            default: 'books.vertical',
-            selected: 'books.vertical.fill',
-          }}
+          sf={fillableTriggerIcon('books.vertical')}
+          renderingMode='template'
+        />
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger
+        name='saved'
+      >
+        <NativeTabs.Trigger.Label>
+          Saved
+        </NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          sf={fillableTriggerIcon('bookmark')}
+          renderingMode='template'
+        />
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger
+        name='settings'
+      >
+        <NativeTabs.Trigger.Label>
+          Settings
+        </NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          sf={fillableTriggerIcon('gearshape')}
+          renderingMode='template'
+        />
+      </NativeTabs.Trigger>
+
+      <NativeTabs.Trigger
+        name='recent'
+      >
+        <NativeTabs.Trigger.Label>
+          Recent
+        </NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          sf={fillableTriggerIcon('clock')}
           renderingMode='template'
         />
       </NativeTabs.Trigger>

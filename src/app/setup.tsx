@@ -1,24 +1,19 @@
-import { GlassView } from 'expo-glass-effect';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import PagerView from 'react-native-pager-view';
 import type { SharedValue } from 'react-native-reanimated';
-import { createAnimatedComponent, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
-import type { SetupStepProps } from '@/components/setup/page';
+import { AnimatedGlass } from '@/components/glass';
+import { useStoreValue } from '@/contexts/store';
 import { useColor } from '@/contexts/theme';
 
-import Step1 from '@/components/setup/language';
-import { Step2 } from '@/components/setup/step-2';
-import { Step3 } from '@/components/setup/step-3';
-import { Step4 } from '@/components/setup/step-4';
+import { STEPS } from '@/components/setup';
 
 // --- Constants ---
 
-const STEPS: React.ComponentType<SetupStepProps>[] = [Step1, Step2, Step3, Step4];
 const MAX_STEP = STEPS.length - 1;
 
 const DOT_SIZE_BASE = 8;
@@ -34,8 +29,6 @@ const DOT_OPACITY_INCREASE = DOT_OPACITY_ACTIVE - DOT_OPACITY_BASE;
 const DOT_ANIMATION_DURATION = 300;
 
 // --- Internal ---
-
-const AnimatedGlassView = createAnimatedComponent(GlassView);
 
 type DotProps = {
   index: number;
@@ -61,9 +54,10 @@ function Dot({ index, animatedPosition, color, visited }: DotProps) {
   });
 
   return (
-    <AnimatedGlassView
+    <AnimatedGlass
       tintColor={color}
-      glassEffectStyle='clear'
+      themed={false}
+      pill
       style={[
         styles.dot,
         animatedStyle,
@@ -76,27 +70,23 @@ function Dot({ index, animatedPosition, color, visited }: DotProps) {
 
 export default function SetupScreen() {
   const router = useRouter();
+  const [_, setHasCompletedSetup] = useStoreValue('hasCompletedSetup');
   const dotColor = useColor('text');
   const animatedPosition = useSharedValue(0);
   const pagerRef = useRef<PagerView>(null);
   const [maxVisitedPage, setMaxVisitedPage] = useState(0);
-  const insets = useSafeAreaInsets();
-  const insetStyle = {
-    paddingTop: insets.top,
-    paddingBottom: insets.bottom,
-  };
-  const indicatorInsetStyle = {
-    bottom: insets.bottom + styles.indicator.bottom,
-  };
 
   const goNext = useCallback((currentStep: number) => {
-    if (currentStep === MAX_STEP)
-      return router.replace('/home');
-    const nextStep = currentStep + 1;
-    if (nextStep === MAX_STEP)
-      pagerRef.current?.setScrollEnabled(true);
-    setMaxVisitedPage((prev) => Math.max(prev, nextStep));
-    pagerRef.current?.setPage(nextStep);
+    if (currentStep === MAX_STEP) {
+      setHasCompletedSetup(true);
+      router.replace('/');
+    } else {
+      const nextStep = currentStep + 1;
+      if (nextStep === MAX_STEP)
+        pagerRef.current?.setScrollEnabled(true);
+      setMaxVisitedPage((prev) => Math.max(prev, nextStep));
+      pagerRef.current?.setPage(nextStep);
+    }
   }, [router]);
 
   return (
@@ -115,10 +105,7 @@ export default function SetupScreen() {
         {STEPS.map((Step, i) => (
           <View
             key={i}
-            style={[
-              styles.container,
-              insetStyle
-            ]}
+            style={styles.container}
           >
             <Step
               onNext={() => goNext(i)}
@@ -130,7 +117,6 @@ export default function SetupScreen() {
       <View
         style={[
           styles.indicator,
-          indicatorInsetStyle,
         ]}
         pointerEvents='none'
       >
@@ -158,7 +144,7 @@ const styles = StyleSheet.create({
   },
   indicator: {
     position: 'absolute',
-    bottom: 32,
+    bottom: 60,
     left: 0,
     right: 0,
     flexDirection: 'row',
@@ -170,7 +156,5 @@ const styles = StyleSheet.create({
     height: DOT_SIZE_BASE,
     minWidth: DOT_SIZE_BASE,
     maxWidth: DOT_WIDTH_ACTIVE,
-    borderCurve: 'circular',
-    borderRadius: 9999,
   },
 });

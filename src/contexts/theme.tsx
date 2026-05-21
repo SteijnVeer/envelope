@@ -58,9 +58,26 @@ export const FontSizes = Object.freeze({
 
 export type FontSizeKey = keyof typeof FontSizes;
 
-export const BottomTabInset = 50;
+export const FontMargin: Readonly<Record<FontSizeKey, typeof Spacing[SpacingKey]>> = Object.freeze({
+  xs:  Spacing.half,
+  sm:  Spacing.one,
+  md:  Spacing.two,
+  lg:  Spacing.three,
+  xl:  Spacing.four,
+  xxl: Spacing.five,
+  caption:    Spacing.half,
+  code:       Spacing.two,
+  label:      Spacing.two,
+  paragraph:  Spacing.three,
+  body:       Spacing.three,
+  subheading: Spacing.four,
+  heading:    Spacing.five,
+  subtitle:   Spacing.five,
+  title:      Spacing.six,
+  display:    Spacing.six,
+});
 
-export const MaxContentWidth = 800;
+export const BottomTabInset = 50;
 
 // --- Internal ---
 
@@ -68,18 +85,22 @@ const DEFAULT_THEME: ThemeSetting = 'auto';
 
 const COLORS = {
   light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
+    text:               DefaultTheme.colors.text,
+    background:         DefaultTheme.colors.background,
+    primary:            DefaultTheme.colors.primary,
+    notification:       DefaultTheme.colors.notification,
+    backgroundElement:  '#F0F0F3',
     backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
+    textSecondary:      '#60646C',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
+    text:               DarkTheme.colors.text,
+    background:         DarkTheme.colors.background,
+    primary:            DarkTheme.colors.primary,
+    notification:       DarkTheme.colors.notification,
+    backgroundElement:  '#212225',
     backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
+    textSecondary:      '#B0B4BA',
   },
 } as const;
 
@@ -101,9 +122,9 @@ const NAV_THEMES: Record<ThemeMode, NavTheme> = {
   light: {
     dark: false,
     colors: {
-      primary:      DefaultTheme.colors.primary,
-      notification: DefaultTheme.colors.notification,
-      background:   COLORS.light.background,
+      primary:      COLORS.light.primary,
+      notification: COLORS.light.notification,
+      background:   '#00000000',
       card:         COLORS.light.backgroundElement,
       text:         COLORS.light.text,
       border:       COLORS.light.backgroundSelected,
@@ -113,9 +134,9 @@ const NAV_THEMES: Record<ThemeMode, NavTheme> = {
   dark: {
     dark: true,
     colors: {
-      primary:      DarkTheme.colors.primary,
-      notification: DarkTheme.colors.notification,
-      background:   COLORS.dark.background,
+      primary:      COLORS.dark.primary,
+      notification: COLORS.dark.notification,
+      background:   '#00000000',
       card:         COLORS.dark.backgroundElement,
       text:         COLORS.dark.text,
       border:       COLORS.dark.backgroundSelected,
@@ -180,6 +201,13 @@ export function useColor(key: ThemeColor) {
 export function useThemeMode(): [ThemeMode, (setting: ThemeSetting) => void] {
   const { mode, setMode } = useContext(ThemeContext);
   return [mode, setMode];
+}
+
+export function useLightDark<T>(value: T | { light?: T; dark?: T }): T {
+  const [theme] = useThemeMode();
+  return typeof value === 'object' && value !== null && ('light' in value || 'dark' in value)
+    ? value[theme] ?? value.light ?? value.dark as T
+    : value as T;
 }
 
 // --- Themed Style Hook ---

@@ -6,6 +6,8 @@ export function Step4({ onNext }: SetupStepProps) {
     <SetupStepPlaceholder
       onNext={onNext}
       index={4}
+      icon='checkmark'
+      nextText='Finish Setup'
     />
   );
 }
