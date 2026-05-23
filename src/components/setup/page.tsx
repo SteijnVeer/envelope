@@ -33,11 +33,11 @@ export function SetupStepPlaceholder({ onNext, index, icon, nextText = 'Next' }:
         size={width * 0.75}
       />}
       <Text
-        type='heading'
+        type='largeTitle'
         text={`Step ${index}`}
       />
       <Text
-        type='subheading'
+        type='title3'
         text={`This is a placeholder for step ${index}.`}
       />
       <GlassButton

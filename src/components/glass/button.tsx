@@ -1,39 +1,35 @@
-import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
+import type { ParamProp, TranslationKey } from '@/contexts/translator';
+import type { PressableProps } from '@/utils/pressable';
+import { hapticPressStart } from '@/utils/pressable';
 import type { ReactNode } from 'react';
 import { useRef } from 'react';
-import type { GestureResponderEvent } from 'react-native';
 import { StyleSheet } from 'react-native';
 import type { GlassProps } from '.';
 import { Glass } from '.';
 import type { TextProps } from '../text';
 import { Text } from '../text';
 
-type PressableProps<E = GestureResponderEvent, R = void | Promise<void>> = {
-  onPressStart?: (e: E) => R;
-  onPressEnd?: (e: E) => R;
-  onPress?: (e: E) => R;
-  onPressCancel?: (e: E) => R;
-};
+export type GlassButtonProps<K extends TranslationKey | string | undefined = undefined> =
+  & Omit<GlassProps, 'children' | 'isInteractive'>
+  & PressableProps
+  & (K extends TranslationKey | string
+    ? {
+      text: K;
+      textProps?: Omit<TextProps<K>, 'text' | 'params'>;
+      children?: undefined;
+    } & ParamProp<K>
+    : {
+      text?: undefined;
+      textProps?: undefined;
+      params?: undefined;
+      children?: ReactNode;
+    });
 
-export type GlassButtonProps = Omit<GlassProps, 'children' | 'isInteractive'> & PressableProps & ({
-  children?: undefined;
-  text?: TextProps['text'];
-  textProps?: Omit<TextProps, 'text'>;
-} | {
-  children?: TextProps['text'];
-  text?: undefined;
-  textProps?: Omit<TextProps, 'text'>;
-} | {
-  children?: ReactNode;
-  text?: undefined;
-  textProps?: undefined;
-});
-
-export function GlassButton({
+export function GlassButton<K extends TranslationKey | string | undefined = undefined>({
   onPress, onPressCancel, onPressStart, onPressEnd, onLayout, onTouchStart, onTouchEnd,
-  children, text, textProps, style,
+  children, text, params, textProps, style,
   ...props
-}: GlassButtonProps) {
+}: GlassButtonProps<K>) {
   const sizeRef = useRef({ width: 0, height: 0 });
 
   return (
@@ -52,7 +48,7 @@ export function GlassButton({
         onLayout?.(e);
       }}
       onTouchStart={(e) => {
-        impactAsync(ImpactFeedbackStyle.Light);
+        hapticPressStart();
         onPressStart?.(e);
         onTouchStart?.(e);
       }}
@@ -67,11 +63,12 @@ export function GlassButton({
         onTouchEnd?.(e);
       }}
     >
-      {typeof text === 'string' || typeof children === 'string' ? (
+      {text !== undefined ? (
         <Text
-          text={text ?? children as TextProps['text']}
-          type='subheading'
-          {...textProps}
+          text={text as TranslationKey | string}
+          params={params as never}
+          type='title3'
+          {...(textProps as Omit<TextProps<TranslationKey | string>, 'text' | 'params'>)}
         />
       ) : (
         children

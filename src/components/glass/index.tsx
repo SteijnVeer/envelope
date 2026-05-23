@@ -13,7 +13,7 @@ export type GlassProps = Omit<GlassViewProps, 'colorScheme'> & {
 
 export function Glass({ glassEffectStyle = 'clear', tintColor: tint, tintOpacity = 0.6, pill, themed = true, style, ...props }: GlassProps) {
   const [theme] = useThemeMode();
-  const themedStyle = useThemedStyle({ paddingHorizontal: 'four', three: ['paddingVertical', 'marginVertical', 'borderRadius'] });
+  const themedStyle = useThemedStyle({ paddingHorizontal: 'xl', lg: ['paddingVertical', 'marginVertical', 'borderRadius'] });
   const tintColor = glassEffectStyle === 'clear'
     ? tinycolor(tint).setAlpha(tintOpacity).toRgbString()
     : tint;

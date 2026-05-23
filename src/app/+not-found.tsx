@@ -23,7 +23,7 @@ export default function NotFound() {
           autoMargin='top'
         />
         <Text
-          type='heading'
+          type='largeTitle'
           text='NOT.FOUND.MESSAGE'
           centered
           autoMargin

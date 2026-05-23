@@ -1,5 +1,7 @@
 import type { FillableIconName, IconName } from '@/components/icon';
 import { useTheme } from '@/contexts/theme';
+import { useTranslations } from '@/contexts/translator';
+import { hapticPressStart } from '@/utils/pressable';
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 
 function fillableTriggerIcon(name: FillableIconName): { default: IconName; selected: IconName } {
@@ -11,9 +13,13 @@ function fillableTriggerIcon(name: FillableIconName): { default: IconName; selec
 
 export default function TabLayout() {
   const colors = useTheme();
+  const t = useTranslations();
 
   return (
     <NativeTabs
+      screenListeners={{
+        tabPress: () => hapticPressStart(),
+      }}
       backgroundColor={colors.background}
       indicatorColor={colors.backgroundElement}
       labelStyle={{
@@ -29,7 +35,7 @@ export default function TabLayout() {
         name='home'
       >
         <NativeTabs.Trigger.Label>
-          Home
+          {t('TABS.HOME')}
         </NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           sf={fillableTriggerIcon('house')}
@@ -41,7 +47,7 @@ export default function TabLayout() {
         name='write'
       >
         <NativeTabs.Trigger.Label>
-          Write
+          {t('TABS.WRITE')}
         </NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           sf={fillableTriggerIcon('books.vertical')}
@@ -53,7 +59,7 @@ export default function TabLayout() {
         name='saved'
       >
         <NativeTabs.Trigger.Label>
-          Saved
+          {t('TABS.SAVED')}
         </NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           sf={fillableTriggerIcon('bookmark')}
@@ -65,7 +71,7 @@ export default function TabLayout() {
         name='settings'
       >
         <NativeTabs.Trigger.Label>
-          Settings
+          {t('TABS.SETTINGS')}
         </NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           sf={fillableTriggerIcon('gearshape')}
@@ -77,7 +83,7 @@ export default function TabLayout() {
         name='recent'
       >
         <NativeTabs.Trigger.Label>
-          Recent
+          {t('TABS.RECENT')}
         </NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
           sf={fillableTriggerIcon('clock')}

@@ -26,7 +26,7 @@ export type BasePageProps = {
   showBackground?: boolean;
 };
 
-const DEFUALT_HORIZONTAL_PADDING: SpacingKey = 'three';
+const DEFUALT_HORIZONTAL_PADDING: SpacingKey = 'lg';
 
 export function StaticPage({ style, children, padHorizontal = true, showBackground = false }: BasePageProps) {
   const { top, bottom } = useSafeAreaInsets();

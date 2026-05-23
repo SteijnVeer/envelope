@@ -1,3 +1,4 @@
+import type { TranslationKey } from '@/contexts/translator';
 import type { LinkProps } from 'expo-router';
 import { Link } from 'expo-router';
 import type { GlassButtonProps } from './button';
@@ -14,11 +15,7 @@ type LinkNavigationProps = Pick<LinkProps,
   | 'dangerouslySingular'
 >;
 
-function LinkableGlassButton({
-  onPress: injectedOnPress,
-  onPressChain,
-  ...props
-}: GlassButtonProps & { onPressChain?: GlassButtonProps['onPress'] }) {
+function LinkableGlassButton({ onPress: injectedOnPress, onPressChain, ...props }: Record<string, any>) {
   return (
     <GlassButton
       {...props}
@@ -30,20 +27,9 @@ function LinkableGlassButton({
   );
 }
 
-export type GlassLinkProps = GlassButtonProps & LinkNavigationProps;
+export type GlassLinkProps<K extends TranslationKey | string | undefined = undefined> = GlassButtonProps<K> & LinkNavigationProps;
 
-export function GlassLink({
-  href,
-  onPress,
-  push,
-  replace,
-  dismissTo,
-  relativeToDirectory,
-  withAnchor,
-  prefetch,
-  dangerouslySingular,
-  ...props
-}: GlassLinkProps) {
+export function GlassLink<K extends TranslationKey | string | undefined = undefined>({ href, onPress, push, replace, dismissTo, relativeToDirectory, withAnchor, prefetch, dangerouslySingular, ...props }: GlassLinkProps<K>) {
   return (
     <Link
       asChild

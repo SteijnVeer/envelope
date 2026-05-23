@@ -1,12 +1,15 @@
 import { AppBackgroundProvider } from '@/contexts/background';
 import { ThemeProvider } from '@/contexts/theme';
 import { TranslatorProvider } from '@/contexts/translator';
+import languageProps from '@/language';
 import { Stack } from 'expo-router';
 
 export default function RootLayout() {
   return (
     <ThemeProvider>
-      <TranslatorProvider>
+      <TranslatorProvider
+        {...languageProps}
+      >
         <AppBackgroundProvider>
           <Stack
             screenOptions={{

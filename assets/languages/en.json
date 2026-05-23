@@ -1,7 +1,11 @@
 {
-  "KEY.NAME.CONVENTION.IS.CAPITALIZED.WITH.DOTS": "translated text",
   "NOT.FOUND.404": "404",
   "NOT.FOUND.GO.BACK": "Go Back",
   "NOT.FOUND.GO.HOME": "Go Home",
-  "NOT.FOUND.MESSAGE": "Page Not Found"
+  "NOT.FOUND.MESSAGE": "Page Not Found",
+  "TABS.HOME": "Home",
+  "TABS.RECENT": "Recent",
+  "TABS.SAVED": "Saved",
+  "TABS.SETTINGS": "Settings",
+  "TABS.WRITE": "Write"
 }
