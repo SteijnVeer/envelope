@@ -1,4 +1,4 @@
-import type { ParamProp, TranslationKey } from '@/contexts/translator';
+import type { ParamProp } from '@/contexts/translator';
 import type { PressableProps } from '@/utils/pressable';
 import { hapticPressStart } from '@/utils/pressable';
 import type { ReactNode } from 'react';
@@ -9,10 +9,10 @@ import { Glass } from '.';
 import type { TextProps } from '../text';
 import { Text } from '../text';
 
-export type GlassButtonProps<K extends TranslationKey | string | undefined = undefined> =
+export type GlassButtonProps<K extends string | undefined = undefined> =
   & Omit<GlassProps, 'children' | 'isInteractive'>
   & PressableProps
-  & (K extends TranslationKey | string
+  & (K extends string
     ? {
       text: K;
       textProps?: Omit<TextProps<K>, 'text' | 'params'>;
@@ -25,7 +25,7 @@ export type GlassButtonProps<K extends TranslationKey | string | undefined = und
       children?: ReactNode;
     });
 
-export function GlassButton<K extends TranslationKey | string | undefined = undefined>({
+export function GlassButton<K extends string | undefined = undefined>({
   onPress, onPressCancel, onPressStart, onPressEnd, onLayout, onTouchStart, onTouchEnd,
   children, text, params, textProps, style,
   ...props
@@ -65,10 +65,10 @@ export function GlassButton<K extends TranslationKey | string | undefined = unde
     >
       {text !== undefined ? (
         <Text
-          text={text as TranslationKey | string}
+          text={text as string}
           params={params as never}
           type='title3'
-          {...(textProps as Omit<TextProps<TranslationKey | string>, 'text' | 'params'>)}
+          {...(textProps as Omit<TextProps<string>, 'text' | 'params'>)}
         />
       ) : (
         children

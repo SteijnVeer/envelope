@@ -1,13 +1,13 @@
 import type { FontKey, FontSizeKey } from '@/contexts/theme';
 import { useFontMargin, useFontTypeStyle, useLightDark, useThemedStyle } from '@/contexts/theme';
-import type { ParamProp, TranslationKey } from '@/contexts/translator';
+import type { ParamProp } from '@/contexts/translator';
 import { useTranslation } from '@/contexts/translator';
 import type { TextProps as RNTextProps } from 'react-native';
 import { Text as RNText, StyleSheet } from 'react-native';
 
 export type TextTypes = FontSizeKey;
 
-export type TextProps<K extends TranslationKey | string> =
+export type TextProps<K extends string> =
   & Omit<RNTextProps, 'children'>
   & ParamProp<K>
   & {
@@ -22,7 +22,7 @@ export type TextProps<K extends TranslationKey | string> =
     centered?: boolean;
   };
 
-export function Text<K extends TranslationKey | string>({ text, type = 'body', fontFamily, color, params, autoMargin = 'none', centered = false, style, ...props}: TextProps<K>) {
+export function Text<K extends string>({ text, type = 'body', fontFamily, color, params, autoMargin = 'none', centered = false, style, ...props}: TextProps<K>) {
   const translated = useTranslation(text, params);
   const fontTypeStyle = useFontTypeStyle(type, fontFamily);
   const themeColorStyle = useThemedStyle({ color: 'text' });

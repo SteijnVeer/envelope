@@ -1,6 +1,12 @@
 import Storage from 'expo-sqlite/kv-store';
 import { useCallback, useEffect, useState } from 'react';
 
+/// declare global {
+///   interface StoreRecordMap {}
+/// }
+/// 
+/// type HasStoreRecordMap = keyof StoreRecordMap extends never ? false : true;
+
 // --- Types ---
 
 type StoreKey = string;

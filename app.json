@@ -39,7 +39,8 @@
       "expo-sqlite",
       "expo-font",
       "expo-image",
-      "expo-status-bar"
+      "expo-status-bar",
+      "expo-localization"
     ],
     "scheme": "envelope",
     "slug": "envelope",

@@ -5,7 +5,7 @@ import type { TranslatorProviderProps } from '@/contexts/translator';
 
 export default {
   defaultLang: 'en',
-  initialLang: 'nl',
+  initialLang: 'auto',
   translations: {
     'en': require('../../assets/languages/en.json'),
     'nl': require('../../assets/languages/nl.json'),

@@ -69,7 +69,7 @@ if (langFiles.length === 0)
 if (!langFiles.includes(defaultLang))
   writeFallback(`Default language "${defaultLang}" not found in: ${inDir}`);
 
-if (initialLang !== undefined && !langFiles.includes(initialLang))
+if (initialLang !== undefined && initialLang !== 'default' && initialLang !== 'auto' && !langFiles.includes(initialLang))
   writeFallback(`Initial language "${initialLang}" not found in: ${inDir}`);
 
 const defaultJson: Record<string, string> = JSON.parse(
@@ -84,7 +84,7 @@ for (const [key, value] of Object.entries(defaultJson))
 
 function generateLanguageMapAugmentation(): string {
   const lines = langFiles.map(lang => `  ${q(lang)}: unknown;`);
-  return `interface TranslatorLanguageMap {\n${lines.join('\n')}\n};`;
+  return `interface TranslatorLanguageSet {\n${lines.join('\n')}\n};`;
 }
 
 function generateParamMapAugmentation(): string {

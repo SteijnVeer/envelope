@@ -1,68 +1,64 @@
 import { useStoreValue } from '@/contexts/store';
+import { getLocales } from 'expo-localization';
 import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useMemo, useRef } from 'react';
-
-declare global {
-  interface TranslatorLanguageMap {}
-  interface TranslatorParamMap {}
-}
+import { createContext, useCallback, useContext, useMemo } from 'react';
 
 // --- Types ---
 
-type HasParsedParamMap = keyof TranslatorParamMap extends never ? false : true;
+declare global {
+  interface TranslatorLanguageSet {}
+  interface TranslatorParamMap {}
+}
 
-export type Language = keyof TranslatorLanguageMap extends never
-  ? string
-  : keyof TranslatorLanguageMap | 'default';
+export type LanguageMode = keyof TranslatorLanguageSet extends never ? string : keyof TranslatorLanguageSet;
+export type LanguageSetting = LanguageMode | 'default' | 'auto';
 
-type ParamsMap = HasParsedParamMap extends true
-  ? TranslatorParamMap
-  : Record<string, string>;
+namespace StrictParamTypes {
+  export type TranslationKey = keyof TranslatorParamMap;
+  export type ParamsTuple<K extends TranslationKey> =
+    [TranslatorParamMap[K]] extends [never]
+      ? []
+      : [params: ParamsRecord<TranslatorParamMap[K]>];
+  export type ParamProp<K extends string> =
+    ParamsTuple<K & TranslationKey> extends [infer P extends ParamsRecord]
+      ? { params: P }
+      : { params?: undefined };
+  export type TranslateFn = {
+    <K extends TranslationKey>(key: K, ...args: ParamsTuple<K>): string;
+    (key: string, params?: ParamsRecord): string;
+  };
+}
 
-export type TranslationKey = keyof ParamsMap;
+namespace FallbackParamsTypes {
+  export type TranslationKey = string;
+  export type ParamsTuple = [params?: ParamsRecord];
+  export type ParamProp = { params?: ParamsRecord };
+  export type TranslateFn = (key: string, params?: ParamsRecord) => string;
+}
 
-export type ParamsOf<K extends TranslationKey> = ParamsMap[K];
+type IsStrict = keyof TranslatorParamMap extends never ? false : true;
 
-export type IfHasParams<K extends TranslationKey | string, Yes, No> = HasParsedParamMap extends true
-  ? K extends TranslationKey
-    ? [ParamsOf<K & TranslationKey>] extends [never]
-      ? No
-      : Yes
-    : No
-  : Yes;
+export type TranslationKey = IsStrict extends true ? StrictParamTypes.TranslationKey : FallbackParamsTypes.TranslationKey;
+export type ParamProp<K extends string> = IsStrict extends true ? StrictParamTypes.ParamProp<K> : FallbackParamsTypes.ParamProp;
 
-export type ParamsRecord<P extends string = string> = Record<P, string | number>;
+type TranslateFn = IsStrict extends true ? StrictParamTypes.TranslateFn : FallbackParamsTypes.TranslateFn;
+type ParamsTuple<K extends TranslationKey> = IsStrict extends true
+  ? StrictParamTypes.ParamsTuple<K & StrictParamTypes.TranslationKey>
+  : FallbackParamsTypes.ParamsTuple;
 
-export type ParamsForKey = HasParsedParamMap extends true
-  ? {
-      [K in TranslationKey as ParamsOf<K> extends never ? never : K]: ParamsRecord<ParamsOf<K>>
-    }
-  : Record<string, ParamsRecord | undefined>;
-
-type ParamsTuple<K extends TranslationKey> = HasParsedParamMap extends true
-  ? IfHasParams<K, [params: ParamsRecord<ParamsOf<K>>], []>
-  : [params?: ParamsRecord];
-
-export type ParamProp<K extends TranslationKey | string> = HasParsedParamMap extends true
-  ? K extends keyof ParamsForKey
-    ? { params: ParamsForKey[K] }
-    : { params?: undefined }
-  : { params?: ParamsRecord };
-
-export type TranslateFn = HasParsedParamMap extends true
-  ? {
-      <K extends TranslationKey>(key: K, ...args: ParamsTuple<K>): string;
-      (key: string, params?: ParamsRecord): string;
-    }
-  : {
-      (key: string, params?: ParamsRecord): string
-    };
-
-type LanguageOption = Exclude<Language, 'default'>;
-
+type ParamsRecord<P extends string = string> = Record<P, string | number>;
 type Translation = Record<TranslationKey, string>;
 
 // --- Helpers ---
+
+function resolveAutoLang(availableKeys: string[], defaultLang: LanguageMode): LanguageMode {
+  for (const { languageTag, languageCode } of getLocales()) {
+    const code = languageCode ?? languageTag.split('-')[0];
+    if (availableKeys.includes(code))
+      return code as LanguageMode;
+  }
+  return defaultLang;
+}
 
 function applyParams(raw: string, key: string, params: ParamsRecord): string {
   return raw.replace(/\{\{(\w+)\}\}|\{(\w+)\}/g, (match, escaped, param) => {
@@ -80,13 +76,17 @@ function applyParams(raw: string, key: string, params: ParamsRecord): string {
 // --- Context ---
 
 type TranslatorContextValue = {
-  lang: Language;
-  setLang: (lang: Language) => void;
+  lang: LanguageMode;
+  langs: LanguageMode[];
+  langSetting: LanguageSetting;
+  setLang: (lang: LanguageSetting) => void;
   t: TranslateFn;
 };
 
 const TranslatorContext = createContext<TranslatorContextValue>({
-  lang: 'default',
+  lang: 'undefined' as LanguageMode,
+  langs: [],
+  langSetting: 'undefined' as LanguageSetting,
   setLang: () => {},
   t: ((key: string) => key) as TranslateFn,
 });
@@ -95,42 +95,50 @@ const TranslatorContext = createContext<TranslatorContextValue>({
 
 export type TranslatorProviderProps = {
   children?: ReactNode;
-  defaultLang: LanguageOption;
-  initialLang?: Language;
-  translations: Record<LanguageOption, Translation>;
+  defaultLang: LanguageMode;
+  initialLang?: LanguageSetting;
+  translations: Record<LanguageMode, Translation>;
 };
 
 export function TranslatorProvider({ children, defaultLang, initialLang, translations }: TranslatorProviderProps) {
-  const [storedLang, setStoredLang] = useStoreValue('language');
+  const [storedLang, setLang] = useStoreValue('language');
+  const langs = Object.keys(translations) as LanguageMode[];
 
-  const lang: Language = (storedLang as Language | null) ?? initialLang ?? defaultLang;
+  const langSetting = useMemo<LanguageSetting>(() =>
+    storedLang as LanguageSetting | null
+    ?? initialLang
+    ?? defaultLang
+  , [storedLang, initialLang, defaultLang]);
 
-  const translationsRef = useRef(translations);
-  translationsRef.current = translations;
-  const defaultLangRef = useRef(defaultLang);
-  defaultLangRef.current = defaultLang;
+  const lang = useMemo<LanguageMode>(() => 
+    langSetting === 'default'
+      ? defaultLang
+      : langSetting === 'auto'
+        ? resolveAutoLang(langs, defaultLang)
+        : langSetting
+  , [langSetting, defaultLang, langs]);
 
-  const setLang = useCallback((next: Language) => setStoredLang(next), [setStoredLang]);
-
-  const value = useMemo<TranslatorContextValue>(
-    () => ({
-      lang,
-      setLang,
-      t: ((key: string, params?: ParamsRecord) => {
-        const resolved = lang === 'default' ? defaultLangRef.current : lang as LanguageOption;
-        const dict = translationsRef.current[resolved] as Record<string, string> | undefined;
-        const raw = dict?.[key] ?? key;
-        if (!params)
-          return raw;
-        return applyParams(raw, key, params);
-      }) as TranslateFn,
+  const t = useCallback<TranslateFn>(
+    ((key: string, params?: ParamsRecord) => {
+      const dict = (translations[lang]/* ?? translations[defaultLang] <- enable in prod to have fallback instead of raw! */) as Record<string, string> | undefined;
+      return dict === undefined || dict[key] === undefined
+        ? key
+        : !params
+          ? dict[key]
+          : applyParams(dict[key], key, params);
     }),
-    [lang, setLang],
+    [lang, translations],
   );
 
   return (
     <TranslatorContext.Provider
-      value={value}
+      value={{
+        lang,
+        langs,
+        langSetting,
+        setLang,
+        t,
+      }}
     >
       {children}
     </TranslatorContext.Provider>
@@ -143,16 +151,13 @@ export function useTranslations(): TranslateFn {
   return useContext(TranslatorContext).t;
 }
 
-export function useTranslation<K extends TranslationKey>(
-  key: K,
-  ...args: ParamsTuple<K>
-): string;
+export function useTranslation<K extends TranslationKey>(key: K, ...args: ParamsTuple<K>): string;
 export function useTranslation(key: string, params?: ParamsRecord): string;
 export function useTranslation(key: string, params?: ParamsRecord): string {
   return useTranslations()(key, params);
 }
 
-export function useLanguage(): [Language, (lang: Language) => void] {
-  const { lang, setLang } = useContext(TranslatorContext);
-  return [lang, setLang];
+export function useLanguage(): Omit<TranslatorContextValue, 't'> {
+  const { lang, langs, langSetting, setLang } = useContext(TranslatorContext);
+  return { lang, langs, langSetting, setLang };
 }

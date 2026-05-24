@@ -9,7 +9,7 @@ import { useLanguage } from '@/contexts/translator';
 
 export default function Settings() {
   const [, setHasCompletedSetup] = useStoreValue('hasCompletedSetup');
-  const [, setLanguage] = useLanguage();
+  const { setLang, langs } = useLanguage();
   const [, setThemeMode] = useThemeMode();
   const store = useStore();
   return (
@@ -79,28 +79,31 @@ export default function Settings() {
         }}
       />
       <Text type='title3' text='DEV OPTIONS LANGUAGE' color='orange' autoMargin='top' />
-      <GlassButton
-        tintColor='green'
-        pill
-        text='Set language to nl'
-        onPress={() => {
-          setLanguage('nl');
-        }}
-      />
-      <GlassButton
-        tintColor='green'
-        pill
-        text='Set language to en'
-        onPress={() => {
-          setLanguage('en');
-        }}
-      />
+      {langs.map((lang) => (
+        <GlassButton
+          key={lang}
+          tintColor='green'
+          pill
+          text={`Set language to ${lang}`}
+          onPress={() => {
+            setLang(lang);
+          }}
+        />
+      ))}
       <GlassButton
         tintColor='orange'
         pill
+        text='Set language to auto'
+        onPress={() => {
+          setLang('auto');
+        }}
+      />
+      <GlassButton
+        tintColor='red'
+        pill
         text='Set language to default'
         onPress={() => {
-          setLanguage('default');
+          setLang('default');
         }}
       />
     </Page>

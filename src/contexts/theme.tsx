@@ -165,6 +165,7 @@ type ColorSet = Readonly<{ [K in ThemeColor]: string }>;
 type ThemeContextValue = {
   colors: ColorSet;
   mode: ThemeMode;
+  isAuto: boolean;
   setMode: (setting: ThemeSetting) => void;
   uiScale: number;
   setUIScale: (setting: UIScaleSetting) => void;
@@ -173,6 +174,7 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue>({
   colors: COLORS.light as ColorSet,
   mode: 'light',
+  isAuto: false,
   setMode: () => {},
   uiScale: 1,
   setUIScale: () => {},
@@ -222,7 +224,8 @@ export function ThemeProvider({ children, theme: initialTheme = DEFAULT_THEME, u
   const setting: ThemeSetting = (storedTheme as ThemeSetting | null) ?? initialTheme;
   const uiScaleSetting: UIScaleSetting = (storedUIScale as UIScaleSetting | null) ?? initialUIScale;
 
-  const resolvedMode: ThemeMode = setting === 'auto'
+  const isAuto = setting === 'auto';
+  const resolvedMode: ThemeMode = isAuto
     ? (systemScheme === 'dark' ? 'dark' : 'light')
     : setting;
 
@@ -234,11 +237,12 @@ export function ThemeProvider({ children, theme: initialTheme = DEFAULT_THEME, u
     () => ({
       colors: COLORS[resolvedMode] as ColorSet,
       mode: resolvedMode,
+      isAuto,
       setMode: setStoredTheme as (setting: ThemeSetting) => void,
       uiScale: resolvedUIScale,
       setUIScale: setStoredUIScale as (setting: UIScaleSetting) => void,
     }),
-    [resolvedMode, resolvedUIScale, setStoredTheme, setStoredUIScale],
+    [resolvedMode, resolvedUIScale, isAuto, setStoredTheme, setStoredUIScale],
   );
 
   return (
