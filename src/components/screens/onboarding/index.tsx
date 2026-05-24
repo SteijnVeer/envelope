@@ -10,7 +10,7 @@ import { AnimatedGlass } from '@/components/glass';
 import { useStoreValue } from '@/contexts/store';
 import { useColor } from '@/contexts/theme';
 
-import { STEPS } from '@/components/setup';
+import { STEPS } from './steps';
 
 // --- Constants ---
 
@@ -68,9 +68,9 @@ function Dot({ index, animatedPosition, color, visited }: DotProps) {
 
 // --- Screen ---
 
-export default function SetupScreen() {
+export function OnboardingScreen() {
   const router = useRouter();
-  const [_, setHasCompletedSetup] = useStoreValue('hasCompletedSetup');
+  const [_, setHasCompletedOnboarding] = useStoreValue('hasCompletedOnboarding');
   const dotColor = useColor('text');
   const animatedPosition = useSharedValue(0);
   const pagerRef = useRef<PagerView>(null);
@@ -78,7 +78,7 @@ export default function SetupScreen() {
 
   const goNext = useCallback((currentStep: number) => {
     if (currentStep === MAX_STEP) {
-      setHasCompletedSetup(true);
+      setHasCompletedOnboarding(true);
       router.replace('/');
     } else {
       const nextStep = currentStep + 1;
@@ -108,7 +108,7 @@ export default function SetupScreen() {
             style={styles.container}
           >
             <Step
-              onNext={() => goNext(i)}
+              goToNextStep={() => goNext(i)}
             />
           </View>
         ))}

@@ -7,7 +7,7 @@ import { useColor } from '@/contexts/theme';
 import { useRouter } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-export default function NotFound() {
+export function NotFoundScreen() {
   const router = useRouter();
   const tintColor = useColor('primary');
   return (

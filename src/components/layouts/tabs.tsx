@@ -11,7 +11,7 @@ function fillableTriggerIcon(name: FillableIconName): { default: IconName; selec
   };
 }
 
-export default function TabLayout() {
+export function TabsLayout() {
   const colors = useTheme();
   const t = useTranslations();
 

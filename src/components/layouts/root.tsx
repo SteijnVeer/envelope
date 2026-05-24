@@ -4,7 +4,7 @@ import { TranslatorProvider } from '@/contexts/translator';
 import languageProps from '@/language';
 import { Stack } from 'expo-router';
 
-export default function RootLayout() {
+export function RootLayout() {
   return (
     <ThemeProvider>
       <TranslatorProvider
@@ -22,13 +22,10 @@ export default function RootLayout() {
               name='index'
             />
             <Stack.Screen
-              name='setup'
+              name='onboarding'
             />
             <Stack.Screen
               name='(tabs)'
-            />
-            <Stack.Screen
-              name='open'
             />
           </Stack>
         </AppBackgroundProvider>
