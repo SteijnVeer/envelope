@@ -1,12 +1,10 @@
-import { useStoreValue } from '@/contexts/store';
+import { _dev_isAuthenticated } from '@/components/layouts';
 import { Redirect } from 'expo-router';
 
 export function AppEntry() {
-  const [hasCompletedOnboarding] = useStoreValue('hasCompletedOnboarding');
-
   return (
     <Redirect
-      href={hasCompletedOnboarding ? '/(tabs)/home' : '/onboarding'}
+      href={_dev_isAuthenticated ? '/(authenticated)/(tabs)/home' : '/(unauthenticated)/hero'}
     />
   );
 }

@@ -1,80 +1,74 @@
-import { GlassButton } from '@/components/glass/button';
-import { GlassLink } from '@/components/glass/link';
-import { Icon } from '@/components/icon';
-import { Page } from '@/components/page';
-import { Text } from '@/components/text';
-import { useColor } from '@/contexts/theme';
+import { Icon } from '@/components/ui/icon';
+import { GlassButton, GlassLink, T, VStack } from '@steijnveer/expo-commons/components';
+import { Rounded, Spacing } from '@steijnveer/expo-commons/constants';
+import { useColor } from '@steijnveer/expo-commons/hooks';
 import { useRouter } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 
 export function NotFoundScreen() {
   const router = useRouter();
   const tintColor = useColor('primary');
+
   return (
-    <Page>
-      <View
-        style={styles.fullWidth}
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'space-between',
+      }}
+    >
+      <VStack
+        centered
+        spacing='lg'
+        style={{
+          padding: Spacing.lg,
+        }}
       >
-        <Text
-          type='display'
-          text='NOT.FOUND.404'
-          color={tintColor}
-          centered
-          autoMargin='top'
-        />
-        <Text
+        <T
           type='largeTitle'
+          text='NOT.FOUND.404'
+          color='primary'
+        />
+        <T
+          type='title1'
           text='NOT.FOUND.MESSAGE'
-          centered
-          autoMargin
+          color='text'
         />
-      </View>
+      </VStack>
+      
+      <Icon
+        name='exclamationmark.magnifyingglass'
+        tintColor={tintColor}
+        style={{
+          width: '100%',
+          height: 'auto',
+          aspectRatio: 1,
+        }}
+      />
 
-      <View
-        style={styles.iconContainer}
+      <VStack
+        spacing={0}
+        style={{
+          paddingTop: Spacing.lg,
+        }}
       >
-        <Icon
-          name='exclamationmark.magnifyingglass'
-          tintColor={tintColor}
-          size='100%'
+        <GlassButton
+          onPress={() => router.back()}
+          disabledOpacity={0}
+          disabled={!router.canGoBack()}
+          glassEffectStyle='clear'
+          style={Rounded.pill}
+          text='NOT.FOUND.GO.BACK'
         />
-      </View>
-
-      <View
-        style={styles.fullWidth}
-      >
         <GlassLink
-          text='NOT.FOUND.GO.HOME'
           href='/'
           replace
+          tintOpacity={null}
           tintColor={tintColor}
-          style={styles.fullWidth}
-          glassEffectStyle='regular'
-          pill
+          glassEffectStyle='clear'
+          style={Rounded.pill}
+          text='NOT.FOUND.GO.HOME'
         />
-        {router.canGoBack() && (
-          <GlassButton
-            text='NOT.FOUND.GO.BACK'
-            onPress={() => router.back()}
-            style={[styles.fullWidth, styles.noMarginVertical]}
-            glassEffectStyle='regular'
-            pill
-          />
-        )}
-      </View>
-    </Page>
+      </VStack>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  fullWidth: {
-    width: '100%',
-  },
-  iconContainer: {
-    flex: 1,
-    maxWidth: '100%',
-  },
-  noMarginVertical: {
-    marginVertical: 0,
-  },
-});

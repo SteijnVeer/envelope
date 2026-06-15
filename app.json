@@ -10,14 +10,15 @@
       },
       "router": {}
     },
-    "icon": "./assets/images/envelope.png",
+    "icon": "./assets/images/envelope-app-icon.png",
     "ios": {
       "buildNumber": "0.0.0",
       "bundleIdentifier": "nl.steijnveer.envelope",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
-      "supportsTablet": false
+      "supportsTablet": false,
+      "usesAppleSignIn": true
     },
     "name": "Envelope",
     "orientation": "portrait",
@@ -33,13 +34,14 @@
           "dark": {
             "backgroundColor": "#000"
           },
-          "image": "./assets/images/envelope.png"
+          "image": "./assets/images/envelope-app-icon.png"
         }
       ],
       "expo-sqlite",
       "expo-font",
       "expo-image",
       "expo-status-bar",
+      "expo-apple-authentication",
       "expo-localization"
     ],
     "scheme": "envelope",

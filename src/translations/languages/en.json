@@ -1,0 +1,14 @@
+{
+  "isFallback": true,
+  "translations": {
+    "NOT.FOUND.404": "404",
+    "NOT.FOUND.GO.BACK": "Go Back",
+    "NOT.FOUND.GO.HOME": "Go Home",
+    "NOT.FOUND.MESSAGE": "Page Not Found",
+    "ROUTES.CREATE": "Create",
+    "ROUTES.HOME": "Home",
+    "ROUTES.MESSAGES": "Messages",
+    "ROUTES.SEARCH": "Search",
+    "ZA": "{name} is {age} years old"
+  }
+}
